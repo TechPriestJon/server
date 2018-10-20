@@ -1,8 +1,10 @@
 # server
 Backend of OnThinIce
 
-## GET /api/tiles
-Gets a summary object for all of the tiles. This object looks like:
+## API
+
+### GET /api/tiles
+Gets a summary object for all of the tiles.
 
 ```json
 [
@@ -14,7 +16,7 @@ Gets a summary object for all of the tiles. This object looks like:
 ]
 ```
 
-## GET /api/tiles/{id}
+### GET /api/tiles/{id}
 Gets all the information about a single tile, including events/history etc.
 
 ```json
@@ -25,18 +27,18 @@ Gets all the information about a single tile, including events/history etc.
 }
 ```
 
-## POST /api/expeditions
+### POST /api/expeditions
 Creates a new expedition request. 
 
 ```json
 {
-    "tileId":"1",
-    "height":"500",
-    "temperature":"0"
+    "title":"Tom's Polar Quest"
 }
 ```
 
-
-
-
-/api/
+```json
+{
+    "success":"true", // This will be false if for some reason the request fails.
+    "guid":"slkjdhgfliaskodflsiadfbhasldif"
+}
+```

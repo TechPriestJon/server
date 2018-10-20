@@ -26,7 +26,6 @@ app.post('/api/plan', function(req, res) {
     });
 });
 
-
 app.get("/api/tiles", function(req, res){
 
 });
