@@ -3,6 +3,7 @@ var Corner = require("./corner.js").Corner;
 var Edge = require("./edge.js").Edge;
 
 function Grid (s) {
+    this.size = s;
     this.tiles = [];
     this.corners = [];
     this.edges = [];

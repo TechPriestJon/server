@@ -1,7 +1,10 @@
 var fs = require('fs');
 var globe = require('./globe/globe.js');
-let data = JSON.stringify(globe.create(0));
-fs.writeFile("./globe.json", data, function(err) {
+let order = 7;
+let scale = 0.615;
+let g = globe.create(order, scale);
+let data = JSON.stringify(g);
+fs.writeFile("./globe_"+order+"_"+scale+".json", data, function(err) {
     if(err) {
         return console.log(err);
     }

@@ -10,16 +10,6 @@ var con = mysql.createConnection({
     database: secrets.database.database,
 });
 
-
-
-nx = 4; ny = 5
-for x in range(nx):
-    lon = 360 * ((x+0.5) / nx)
-    for y in range(ny):                                                         
-        midpt = (y+0.5) / ny                                                    
-        lat = 180 * asin(2*((y+0.5)/ny-0.5))                                    
-        print lon,lat   
-
 let tiles = [];
 for(let i=0;i<10;i++){
     tiles.push({

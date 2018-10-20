@@ -1,30 +1,36 @@
 var Grid = require("./grid.js").Grid;
 var Vector3 = require("./vector3.js").Vector3;
 
-function create(size){
-	let g = size_n_grid(size);
-	let vectors = Array.from(g.corners.map(c => c.v).filter(onlyUnique));
+function create(size, scale){
+	let g = size_n_grid(size, scale);
+	let vectors = Array.from(g.corners.map(c => c.v).filter(onlyUnique))
+		//.filter(v => v.z > 0.5 || v.z < -0.5));
+
 	let earth = {
 		vertices: vectors.map(v => ({x: v.x, y: v.y, z: v.z})),
 		tiles: g.tiles.map(tile => tile.corners.map(corner => vectors.indexOf(corner.v))),
+			//.filter(tile => tile.every(t => t != -1)),
 	}
+
 	return earth;
 }
 
-function size_n_grid(size) {
+function size_n_grid(size, scale) {
 	if (size === 0) {
-		return size_0_grid();
+		return size_0_grid(scale);
 	}
 	else {
-		return _subdivided_grid(size_n_grid(size-1));
+		return _subdivided_grid(size_n_grid(size-1, scale));
 	}
 }
 
-function size_0_grid () {
+function size_0_grid(scale) {
 	let grid = new Grid(0);
-	let x = -0.525731112119133606;
-	let z = -0.850650808352039932;
-	
+	// let x = -0.525731112119133606;
+	// let z = -0.850650808352039932;
+	let x = -0.525731112119133606 * scale;
+	let z = -0.850650808352039932 * scale;
+
 	let icos_tiles = [
 		new Vector3(-x, 0, z), new Vector3(x, 0, z),new Vector3(-x, 0, -z),new Vector3(x, 0, -z),
 		new Vector3(0, z, x), new Vector3(0, z, -x),new Vector3(0, -z, x), new Vector3(0, -z, -x),
@@ -147,10 +153,6 @@ function _add_corner (id, grid, t1, t2, t3) {
 function _add_edge (id, grid, t1, t2) {
 	let e = grid.edges[id];
 	let t = [grid.tiles[t1], grid.tiles[t2]];
-
-	console.log((t[0].position_tile(t[1])+1)%t[0].edge_count)
-	console.log(t[0].corners);
-
 	let c = [
 		grid.corners[t[0].corners[t[0].position_tile(t[1])].id],
         grid.corners[t[0].corners[(t[0].position_tile(t[1])+1)%t[0].edge_count].id]
@@ -166,12 +168,4 @@ function _add_edge (id, grid, t1, t2) {
 function onlyUnique(value, index, self) { 
 	return self.indexOf(value) === index;
 }
-
-function close_enough(a, b){
-	if (Math.abs(a.x - b.x) > 0.0001) return false;
-	if (Math.abs(a.y - b.y) > 0.0001) return false;
-	if (Math.abs(a.z - b.z) > 0.0001) return false;
-	return true;
-}
-
 exports.create = create;
