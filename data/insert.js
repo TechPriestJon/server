@@ -17,20 +17,15 @@ for(let i=0;i<10;i++){
         temperature: Math.random()*40-30
     });
 }
-
 con.connect(function(err) {
     if (err) throw err;
-    console.log("Connected to database.");
-    console.log(tiles);
     var query = InsertQuery({
         maxRow: tiles.length,
         table: 'Tiles',
         data: tiles
     });
-       
     let sql = query.next();
     con.query(sql, function (err, result) {
         if (err) throw err;
-        console.log(result);
     });
 });

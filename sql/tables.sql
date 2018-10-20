@@ -33,5 +33,6 @@ CREATE TABLE ExpeditionStatuses (
     expeditionId INT NOT NULL,
     routeProgress INT NOT NULL,
     massOfFood DOUBLE NOT NULL,
+    numberOfPeople INT NOT NULL,
 	FOREIGN KEY (expeditionId) REFERENCES Expeditions (id)
 );

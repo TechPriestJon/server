@@ -59,8 +59,9 @@ function createExpedition(req, callback) {
             if (err && callback) callback(err);
             let expeditionStatus = {
                 expeditionId: expeditionResult.insertId,
+                numberOfPeople: parseInt(expedition.numberOfPeople),
                 routeProgress: 0,
-                massOfFood: 10,
+                massOfFood: parseFloat(expedition.massOfFood),
             }
             con.query(InsertQuery({table:"ExpeditionStatuses", data: [expeditionStatus], maxRow:1}).next(), (err, result) => {
                 if (err && callback) callback(err);
@@ -74,8 +75,8 @@ function createExpedition(req, callback) {
     });
 }
 
-function updateStatus(expeditionStatusId, nextRouteProgress){
-    con.query("UPDATE ExpeditionStatuses SET routeProgress="+nextRouteProgress+" WHERE id="+expeditionStatusId, function (err, result) {
+function updateStatus(expeditionStatusId, nextRouteProgress, massOfFood){
+    con.query("UPDATE ExpeditionStatuses SET routeProgress="+nextRouteProgress+",massOfFood="+massOfFood+" WHERE id="+expeditionStatusId, function (err, result) {
         if (err) logger.error(err);
         else {         
             con.query("SELECT * FROM ExpeditionStatuses WHERE id="+expeditionStatusId, function (err, result) {
@@ -92,23 +93,46 @@ function calculateTimeToNextWaypoint(expeditionStatus, callback){
         if (err && callback) callback(err);
         let currentWayPoint = result[0];
         let nextRouteProgress = currentWayPoint.routeOrder+1;
-        console.log(currentWayPoint);
-        console.log("nextRouteProgress:"+nextRouteProgress);
         con.query("SELECT * FROM WayPoints WHERE routeOrder="+nextRouteProgress, (err, result) => {
             if (err && callback) callback(err);
-            let nextWayPoint = result[0];
-            let timeToNextWayPoint = 1000;
-
-            if (nextWayPoint == null) {
-                logger.info("route completed!");
+            if (result.length == 0){
+                logger.info("Expedition has completed successfully!");
                 if (callback) callback();
             }
             else {
-                setTimeout(updateStatus, timeToNextWayPoint, expeditionStatus.id, nextRouteProgress);
-                if (callback) callback(err);
+                let nextWayPoint = result[0];
+                let timeToNextWayPoint = 1000;
+                calcFoodRequired(expeditionStatus.numberOfPeople, currentWayPoint.tileId, nextWayPoint.tileId, (err, foodRequired) => {
+                    if (err && callback) callback(err);
+                    let newMassOfFood = Math.max(0, expeditionStatus.massOfFood - foodRequired);
+                    setTimeout(updateStatus, timeToNextWayPoint, expeditionStatus.id, nextRouteProgress, newMassOfFood);
+                });
             }
         });
     });
+}
+
+function calcFoodRequired(numberOfPeople, currentTileId, nextTileId, callback){
+    con.query("SELECT * FROM Tiles WHERE id="+currentTileId, (err, result) => {
+        if (callback && err) callback(err);
+        else {
+            let currentTile = result[0];
+            con.query("SELECT * FROM Tiles WHERE id="+nextTileId, (err, result) => {
+                if (callback && err) callback(err);
+                let nextTile = result[0];
+                let elevationChange = nextTile.height - currentTile.height;
+                let elevationFactor = 1 + Math.max(0, elevationChange) * 0.0001;
+                let temperatureFactor = 1 - Math.min(0, nextTile.temperature) * 0.001;
+                const baseAmountOfFood = 10;
+                let foodRequired = Math.max(0, numberOfPeople * (baseAmountOfFood * elevationFactor * temperatureFactor));
+                callback(null, foodRequired);
+            });
+        }
+    });
+}
+
+function totalMassCapacity(numberOfPeople){
+    return Math.exp(numberOfPeople); 
 }
 
 function getDatabase(table){
