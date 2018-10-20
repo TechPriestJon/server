@@ -38,7 +38,7 @@ Creates a new expedition request.
 
 ```json
 {
-    "success":"true", // This will be false if for some reason the request fails.
-    "guid":"slkjdhgfliaskodflsiadfbhasldif"
+    "success":"true",
+    "guid":"45745c60-7b1a-11e8-9c9c-2d42b21b1a3e"
 }
 ```
