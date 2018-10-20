@@ -1,0 +1,24 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "the backend of on-thin-ice server",
+  "main": "index.js",
+  "dependencies": {
+    "bunyan": "^1.8.12",
+    "express": "^4.16.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/on-thin-ice/server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/on-thin-ice/server/issues"
+  },
+  "homepage": "https://github.com/on-thin-ice/server#readme"
+}
