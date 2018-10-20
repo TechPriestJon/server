@@ -5,7 +5,9 @@
   "main": "index.js",
   "dependencies": {
     "bunyan": "^1.8.12",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "mysql": "^2.16.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {},
   "scripts": {
