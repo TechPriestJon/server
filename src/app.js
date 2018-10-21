@@ -6,7 +6,7 @@ const sqlgen = new (require('sql-generator'))();
 var InsertQuery = require('mysql-insert-multiple');
 
 let logger = logging.logger;
-const port = 80;
+const port = 3000;
 const url="on-thin-ice.github.com"
 var mysql = require("mysql");
 const uuidv1 = require('uuid/v1');
@@ -266,6 +266,4 @@ app.get("/api/debug/tiles", getDatabase("Tiles"));
 app.get("/api/debug/tiles/:id", getDatabase("Tiles", true));
 app.get("/api/debug/waypoints", getDatabase("Waypoints"));
 
-app.listen(port, function() {
-    logger.info("Server running at http://localhost:"+port+"/");
-});
+module.exports = app;

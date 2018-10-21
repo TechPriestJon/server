@@ -7,6 +7,7 @@
     "bunyan": "^1.8.12",
     "express": "^4.16.4",
     "fs": "0.0.1-security",
+    "http": "0.0.0",
     "mysql": "^2.16.0",
     "mysql-insert-multiple": "^1.0.4",
     "perlin-simplex": "0.0.3",
