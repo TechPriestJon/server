@@ -78,8 +78,7 @@ function createExpedition(req, callback) {
         }
 
         con.query("SELECT * FROM Tiles", (err, result) => {
-        let route = result[Math.floor(Math.random()*result.length)].id;
-        let parsed = Array.from(route.split(",").map(w => parseInt(w)));
+        let parsed = [result[Math.floor(Math.random()*result.length)].id];
         console.log(parsed);
         if (expedition.title === undefined || expedition.title === "") expedition.title = "New expedition";
         if (expedition.massOfFood === undefined || expedition.massOfFood === "") expedition.massOfFood = 100;
