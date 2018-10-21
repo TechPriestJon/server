@@ -155,3 +155,6 @@
 {"name":"test","hostname":"DESKTOP-33A94EV","pid":7844,"level":30,"msg":"Starting server","time":"2018-10-21T02:05:06.186Z","v":0}
 {"name":"test","hostname":"DESKTOP-33A94EV","pid":7844,"level":30,"msg":"Server running at http://localhost:80/","time":"2018-10-21T02:05:06.587Z","v":0}
 {"name":"test","hostname":"DESKTOP-33A94EV","pid":7844,"level":30,"msg":"[::1] for [/api/tiles]","time":"2018-10-21T02:05:24.973Z","v":0}
+{"name":"test","hostname":"DESKTOP-33A94EV","pid":14884,"level":30,"msg":"Starting server","time":"2018-10-21T02:11:10.596Z","v":0}
+{"name":"test","hostname":"DESKTOP-33A94EV","pid":14884,"level":30,"msg":"Server running at http://localhost:80/","time":"2018-10-21T02:11:11.001Z","v":0}
+{"name":"test","hostname":"DESKTOP-33A94EV","pid":14884,"level":30,"msg":"[::1] for [/api/tiles]","time":"2018-10-21T02:11:18.139Z","v":0}
