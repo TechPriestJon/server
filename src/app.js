@@ -30,10 +30,10 @@ try {
 catch {
     logger.warn("Failed to find secrets file.")
     try {
-        logger.debug(process.env.host);
-        logger.debug(process.env.user);
-        logger.debug(process.env.database);
-        logger.debug(process.env.password);
+        logger.info(process.env.host);
+        logger.info(process.env.user);
+        logger.info(process.env.database);
+        logger.info(process.env.password);
         var con = mysql.createConnection({
             host: process.env.host,
             user: process.env.user,
@@ -42,7 +42,7 @@ catch {
         });
     }
     catch(err){
-        logger.debug(err);
+        logger.error(err);
     }
 }
 logger.info("did I error..?");
