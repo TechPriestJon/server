@@ -51,10 +51,15 @@ con.connect(function(err) {
 });
 
 app.post('/api/plan', (req, res) => {
-    createExpedition(req, (err, expedition) => {
-        if (err) logger.error(err);
-        else res.redirect(url+"/globe.html?expedition="+expedition.guid);
-    });
+    try{
+        createExpedition(req, (err, expedition) => {
+            if (err) logger.error(err);
+            else res.redirect(url+"/globe.html?expedition="+expedition.guid);
+        });
+    }
+    catch(err){
+        logger.error(err);
+    }
 });
 
 function createExpedition(req, callback) {
