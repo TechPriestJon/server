@@ -76,7 +76,8 @@ function createExpedition(req, callback) {
             massOfEquipment: req.body.massOfEquipment,
             numberOfPeople: req.body.numberOfPeople,
         }
-        let parsed = Array.from(req.body.waypoints.split(",").map(w => parseInt(w)));
+        let route = "8681,34362,34366,6535,6536,16264,16261,16269";
+        let parsed = Array.from(route.split(",").map(w => parseInt(w)));
         console.log(parsed);
         if (expedition.title === undefined || expedition.title === "") expedition.title = "New expedition";
         if (expedition.massOfFood === undefined || expedition.massOfFood === "") expedition.massOfFood = 100;
