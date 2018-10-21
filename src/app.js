@@ -18,7 +18,7 @@ app.use(express.json());
 
 logger.info("Starting server");
 
-try{
+try {
     const secrets = require("./../secrets.json");
     var con = mysql.createConnection({
         host: secrets.database.host,
@@ -29,8 +29,11 @@ try{
 }
 catch {
     logger.warn("Failed to find secrets file.")
-    try{
-
+    try {
+        logger.debug(process.env.host);
+        logger.debug(process.env.user);
+        logger.debug(process.env.database);
+        logger.debug(process.env.password);
         var con = mysql.createConnection({
             host: process.env.host,
             user: process.env.user,
@@ -42,6 +45,8 @@ catch {
         logger.debug(err);
     }
 }
+logger.info("did I error..?");
+logger.info("Hi Ben :D");
 con.connect(function(err) {
     if (err) throw err;
 });
