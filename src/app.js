@@ -256,6 +256,8 @@ app.get("/api/expeditions", (req, res) => {
     }
 });
 
+app.get("/api/debug", (req, res) => res.json(({"message":"hello"})));
+
 // debugs
 app.get("/api/debug/expeditions", getDatabase("Expeditions"));
 app.get("/api/debug/expedition-statuses", getDatabase("ExpeditionStatuses"));
