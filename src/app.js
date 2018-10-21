@@ -168,7 +168,7 @@ function calculateTimeToNextWaypoint(expeditionStatus, callback){
                 }
                 else {
                     let nextWayPoint = result[0];
-                    let timeToNextWayPoint = 1000;
+                    let timeToNextWayPoint = 5000;
                     let nextUpdate = new Date().getTime() + timeToNextWayPoint;
                     con.query("UPDATE ExpeditionStatuses SET nextUpdate="+nextUpdate+" WHERE id="+expeditionStatus.id, function (err, result) {
                         if (err) logger.error(err);
