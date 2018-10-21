@@ -15,7 +15,8 @@ CREATE TABLE Expeditions (
     title VARCHAR(100) NOT NULL,
     guid VARCHAR(36) NOT NULL,
     numberOfPeople INT NOT NULL,
-    massOfFood DOUBLE NOT NULL
+    massOfFood DOUBLE NOT NULL,
+    massOfEquipment DOUBLE NOT NULL
 );
 
 CREATE TABLE WayPoints (
@@ -29,8 +30,8 @@ CREATE TABLE WayPoints (
 
 CREATE TABLE ExpeditionStatusTypes (
     id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    name VARCHAR(20) NOT NULL,
-    description VARCHAR(100) NOT NULL
+    name VARCHAR (20) NOT NULL,
+    description VARCHAR (100) NOT NULL
 );
 INSERT INTO ExpeditionStatusTypes (name,description) VALUES
 ("In Progress", "The expedition is currently underway."),
@@ -42,7 +43,9 @@ CREATE TABLE ExpeditionStatuses (
     expeditionId INT NOT NULL,
     expeditionStatusTypeId INT NOT NULL,
     routeProgress INT NOT NULL,
+    nextUpdate BIGINT NOT NULL,
     massOfFood DOUBLE NOT NULL,
+    massOfEquipment DOUBLE NOT NULL,
     numberOfPeople INT NOT NULL,
 	FOREIGN KEY (expeditionId) REFERENCES Expeditions (id),
     FOREIGN KEY (expeditionStatusTypeId) REFERENCES ExpeditionStatusTypes (id)

@@ -39,16 +39,15 @@ catch {
             user: process.env.user,
             password: process.env.password,
             database: process.env.database
-        });
+        }); 
     }
     catch(err){
         logger.error(err);
     }
 }
-logger.info("did I error..?");
-logger.info("Hi Ben :D");
 con.connect(function(err) {
     if (err) throw err;
+    logger.info("Connected to the database OK.");
 });
 
 app.post('/api/plan', (req, res) => {
@@ -64,6 +63,7 @@ function createExpedition(req, callback) {
         title: req.body.title,
         guid: uuidv1(),
         massOfFood: req.body.massOfFood,
+        massOfEquipment: req.body.massOfEquipment,
         numberOfPeople: req.body.numberOfPeople,
     }
     con.query(InsertQuery({table:"Expeditions", data: [expedition], maxRow:1}).next(), (err, expeditionResult) => {
@@ -83,7 +83,9 @@ function createExpedition(req, callback) {
                 expeditionId: expeditionResult.insertId,
                 numberOfPeople: parseInt(expedition.numberOfPeople),
                 routeProgress: 0,
+                nextUpdate: new Date().getTime(),
                 expeditionStatusTypeId: 1,
+                massOfEquipment: parseFloat(expedition.massOfEquipment),
                 massOfFood: parseFloat(expedition.massOfFood),
             }
             con.query(InsertQuery({table:"ExpeditionStatuses", data: [expeditionStatus], maxRow:1}).next(), (err, result) => {
@@ -138,11 +140,16 @@ function calculateTimeToNextWaypoint(expeditionStatus, callback){
                 else {
                     let nextWayPoint = result[0];
                     let timeToNextWayPoint = 1000;
+                    let nextUpdate = new Date().getTime() + timeToNextWayPoint;
+                    con.query("UPDATE ExpeditionStatuses SET nextUpdate="+nextUpdate+" WHERE id="+expeditionStatus.id, function (err, result) {
+                        if (err) logger.error(err);
+
                     calcFoodRequired(expeditionStatus.numberOfPeople, currentWayPoint.tileId, nextWayPoint.tileId, (err, foodRequired) => {
                         if (err && callback) callback(err);
                         let newMassOfFood = Math.max(0, expeditionStatus.massOfFood - foodRequired);
                         setTimeout(updateStatus, timeToNextWayPoint, expeditionStatus.id, nextRouteProgress, newMassOfFood);
                     });
+                });
                 }
             });
         });
@@ -215,20 +222,39 @@ app.get("/api/tiles", (req, res) => {
 });
 app.get("/api/expeditions", (req, res) => {
     try{
-        let sql = "SELECT * FROM ExpeditionStatuses"
-        con.query(sql, function (err, result) {
+        con.query("SELECT * FROM ExpeditionStatusTypes", function (err, expeditionStatusTypes) {
             if (err) throw err;
-            res.json(result.map(expedition => {
-
-
-            }));
+        con.query("SELECT * FROM ExpeditionStatuses", function (err, expeditionStatuses) {
+            if (err) throw err;
+            con.query("SELECT * FROM Expeditions", function (err, expeditions) {
+                if (err) throw err;
+                con.query("SELECT * FROM WayPoints", function (err, wayPoints) {
+                    if (err) throw err;
+                    res.json(expeditionStatuses.map(expeditionStatus => {
+                        let wayPoint = wayPoints.find(wp => wp.expeditionId === expeditionStatus.expeditionId && wp.routeOrder === expeditionStatus.routeProgress);
+                        let expedition = expeditions.find(e => e.id === expeditionStatus.expeditionId);
+                        let statusType = expeditionStatusTypes.find(es => es.id === expeditionStatus.expeditionStatusTypeId)
+                        return ({
+                            id: expeditionStatus.expeditionId,
+                            title: expedition.title,
+                            statusId: expeditionStatus.expeditionStatusTypeId,
+                            status: statusType.name,
+                            nextUpdate: new Date(expeditionStatus.nextUpdate),
+                            massOfFood: expeditionStatus.massOfFood,
+                            massOfEquipment: expeditionStatus.massOfEquipment,
+                            routeProgress: expeditionStatus.routeProgress,
+                            tileId: wayPoint.tileId,
+                        })
+                    }));
+                });
+            });
+        });
         });
     }
     catch (err){
         logger.error(err);
     }
 });
-
 
 // debugs
 app.get("/api/debug/expeditions", getDatabase("Expeditions"));
