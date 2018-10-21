@@ -29,14 +29,19 @@ try{
 }
 catch {
     logger.warn("Failed to find secrets file.")
-    var con = mysql.createConnection({
-        host: process.env.host,
-        user: process.env.user,
-        password: process.env.password,
-        database: process.env.database
-    });
+    try{
+
+        var con = mysql.createConnection({
+            host: process.env.host,
+            user: process.env.user,
+            password: process.env.password,
+            database: process.env.database
+        });
+    }
+    catch(err){
+        logger.debug(err);
+    }
 }
-logger.debug(con);
 con.connect(function(err) {
     if (err) throw err;
 });
