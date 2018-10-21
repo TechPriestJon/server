@@ -15,7 +15,11 @@ var app = express();
 app.use(logging.request_logger);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 logger.info("Starting server");
 
 try {
@@ -63,47 +67,65 @@ app.post('/api/plan', (req, res) => {
 });
 
 function createExpedition(req, callback) {
-    logger.info("Creating new expedition: " + req.body.title);
-    let expedition = {
-        title: req.body.title,
-        guid: uuidv1(),
-        massOfFood: req.body.massOfFood,
-        massOfEquipment: req.body.massOfEquipment,
-        numberOfPeople: req.body.numberOfPeople,
-    }
-    con.query(InsertQuery({table:"Expeditions", data: [expedition], maxRow:1}).next(), (err, expeditionResult) => {
-        if (err && callback) callback(err);
-        let waypoints = [];
-        let parsed = Array.from(req.body.waypoints.split(",").map(w => parseInt(w)));
-        for(let i=0;i<parsed.length;i++){
-            let request_waypoint = parsed[i];
-            waypoints.push({
-                expeditionId: expeditionResult.insertId,
-                tileId: request_waypoint,
-                routeOrder: i,
-            });
+    try{
+        logger.info("Creating new expedition: " + req.body.title);
+        let expedition = {
+            title: req.body.title,
+            guid: uuidv1(),
+            massOfFood: req.body.massOfFood,
+            massOfEquipment: req.body.massOfEquipment,
+            numberOfPeople: req.body.numberOfPeople,
         }
-        con.query(InsertQuery({table:"WayPoints", data: waypoints, maxRow: waypoints.length}).next(), (err, result) => {
+        let parsed = Array.from(req.body.waypoints.split(",").map(w => parseInt(w)));
+        console.log(parsed);
+        if (expedition.title === undefined || expedition.title === "") expedition.title = "New expedition";
+        if (expedition.massOfFood === undefined || expedition.massOfFood === "") expedition.massOfFood = 100;
+        if (expedition.massOfEquipment === undefined || expedition.massOfEquipment === "") expedition.massOfEquipment = 100;
+        if (expedition.numberOfPeople === undefined || expedition.numberOfPeople === "") expedition.numberOfPeople = 1;
+        if (parsed.length == 0 || !parsed.every(i => i != NaN)){
+            logger.error("Something has gone wrong");
+            callback();
+            return;
+        }
+
+        con.query(InsertQuery({table:"Expeditions", data: [expedition], maxRow:1}).next(), (err, expeditionResult) => {
             if (err && callback) callback(err);
-            let expeditionStatus = {
-                expeditionId: expeditionResult.insertId,
-                numberOfPeople: parseInt(expedition.numberOfPeople),
-                routeProgress: 0,
-                nextUpdate: new Date().getTime(),
-                expeditionStatusTypeId: 1,
-                massOfEquipment: parseFloat(expedition.massOfEquipment),
-                massOfFood: parseFloat(expedition.massOfFood),
+            let waypoints = [];
+
+            for(let i=0;i<parsed.length;i++){
+                let request_waypoint = parsed[i];
+                waypoints.push({
+                    expeditionId: expeditionResult.insertId,
+                    tileId: request_waypoint,
+                    routeOrder: i,
+                });
             }
-            con.query(InsertQuery({table:"ExpeditionStatuses", data: [expeditionStatus], maxRow:1}).next(), (err, result) => {
+
+            con.query(InsertQuery({table:"WayPoints", data: waypoints, maxRow: waypoints.length}).next(), (err, result) => {
                 if (err && callback) callback(err);
-                else {
-                    expeditionStatus.id = result.insertId;
-                    calculateTimeToNextWaypoint(expeditionStatus);
-                    callback(null, expedition);
+                let expeditionStatus = {
+                    expeditionId: expeditionResult.insertId,
+                    numberOfPeople: parseInt(expedition.numberOfPeople),
+                    routeProgress: 0,
+                    nextUpdate: new Date().getTime(),
+                    expeditionStatusTypeId: 1,
+                    massOfEquipment: parseFloat(expedition.massOfEquipment),
+                    massOfFood: parseFloat(expedition.massOfFood),
                 }
+                con.query(InsertQuery({table:"ExpeditionStatuses", data: [expeditionStatus], maxRow:1}).next(), (err, result) => {
+                    if (err && callback) callback(err);
+                    else {
+                        expeditionStatus.id = result.insertId;
+                        calculateTimeToNextWaypoint(expeditionStatus);
+                        callback(null, expedition);
+                    }
+                });
             });
         });
-    });
+    }
+    catch(err) {
+        logger.error("Oh man it's gone wrong again :/");
+    }
 }
 
 function updateStatus(expeditionStatusId, nextRouteProgress, massOfFood){
