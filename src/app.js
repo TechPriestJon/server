@@ -7,7 +7,7 @@ var InsertQuery = require('mysql-insert-multiple');
 
 let logger = logging.logger;
 const port = 3000;
-const url="on-thin-ice.github.com"
+const url="http://on-thin-ice.github.io"
 var mysql = require("mysql");
 const uuidv1 = require('uuid/v1');
 
@@ -54,7 +54,7 @@ app.post('/api/plan', (req, res) => {
     try{
         createExpedition(req, (err, expedition) => {
             if (err) logger.error(err);
-            else res.redirect(url+"/globe.html?expedition="+expedition.guid);
+            else res.redirect(url+"?expedition="+expedition.guid);
         });
     }
     catch(err){
@@ -74,8 +74,9 @@ function createExpedition(req, callback) {
     con.query(InsertQuery({table:"Expeditions", data: [expedition], maxRow:1}).next(), (err, expeditionResult) => {
         if (err && callback) callback(err);
         let waypoints = [];
-        for(let i=0;i<req.body.waypoints.length;i++){
-            let request_waypoint = req.body.waypoints[i];
+        let parsed = Array.from(req.body.waypoints.split(",").map(w => parseInt(w)));
+        for(let i=0;i<parsed.length;i++){
+            let request_waypoint = parsed[i];
             waypoints.push({
                 expeditionId: expeditionResult.insertId,
                 tileId: request_waypoint,
