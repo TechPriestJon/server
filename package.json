@@ -9,6 +9,7 @@
     "fs": "0.0.1-security",
     "mysql": "^2.16.0",
     "mysql-insert-multiple": "^1.0.4",
+    "perlin-simplex": "0.0.3",
     "sql-generator": "0.0.8",
     "uuid": "^3.3.2"
   },

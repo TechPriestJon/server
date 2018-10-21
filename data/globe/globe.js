@@ -1,17 +1,22 @@
 var Grid = require("./grid.js").Grid;
 var Vector3 = require("./vector3.js").Vector3;
+var Simplex = require('perlin-simplex');
 
 function create(size, scale){
 	let g = size_n_grid(size, scale);
 	let vectors = Array.from(g.corners.map(c => c.v).filter(onlyUnique))
-		//.filter(v => v.z > 0.5 || v.z < -0.5));
-
+	let simplex = new Simplex();
+	let sA = 5;
+	let sB = 10;
 	let earth = {
-		vertices: vectors.map(v => ({x: v.x, y: v.y, z: v.z})),
+		vertices: vectors.map(v => {
+			let h = 1;
+			h += 0.2 * simplex.noise3d(sA*v.x, sA*v.y, sA*v.z);
+			h += simplex.noise3d(sB*v.x, sB*v.y, sB*v.z);
+			return ({x: v.x, y: v.y, z: v.z, h: h})
+		}),
 		tiles: g.tiles.map(tile => tile.corners.map(corner => vectors.indexOf(corner.v))),
-			//.filter(tile => tile.every(t => t != -1)),
 	}
-
 	return earth;
 }
 
