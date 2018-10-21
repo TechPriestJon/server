@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "the backend of on-thin-ice server",
-  "main": "index.js",
+  "main": "src/app.js",
   "dependencies": {
     "bunyan": "^1.8.12",
     "express": "^4.16.4",
